@@ -23,7 +23,7 @@ class ViewController: UIViewController {
         
         centerMapOnLocation(location: initialLocation)
         
-        
+        mapView.delegate = self
      
         let artwork = Artwork(title: "King David Kalakaua",
                               locationName: "Waikiki Gateway Park",
@@ -39,7 +39,31 @@ class ViewController: UIViewController {
                                                   latitudinalMeters: regionRadius, longitudinalMeters: regionRadius)
         mapView.setRegion(coordinateRegion, animated: true)
     }
+    
 
+}
 
+extension ViewController: MKMapViewDelegate {
+    // 1
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        // 2
+        guard let annotation = annotation as? Artwork else { return nil }
+        // 3
+        let identifier = "marker"
+        var view: MKMarkerAnnotationView
+        // 4
+        if let dequeuedView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+            as? MKMarkerAnnotationView {
+            dequeuedView.annotation = annotation
+            view = dequeuedView
+        } else {
+            // 5
+            view = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+            view.canShowCallout = true
+            view.calloutOffset = CGPoint(x: -5, y: 5)
+            view.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+        }
+        return view
+    }
 }
 
